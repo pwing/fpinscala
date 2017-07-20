@@ -46,23 +46,87 @@ object List { // `List` companion object. Contains functions for creating and wo
   def sum2(ns: List[Int]) =
     foldRight(ns, 0)((x,y) => x + y)
 
+  def sumWithFoldLeft(ns: List[Int]) =
+    foldLeft(ns, 0)((x,y) => x + y)
+
   def product2(ns: List[Double]) =
     foldRight(ns, 1.0)(_ * _) // `_ * _` is more concise notation for `(x,y) => x * y`; see sidebar
 
 
-  def tail[A](l: List[A]): List[A] = ???
+  def tail[A](l: List[A]): List[A] = {
+    l match {
+      case Cons(h,t) => t
+      case Nil => throw new IllegalArgumentException
+    }
+  }
 
-  def setHead[A](l: List[A], h: A): List[A] = ???
+  def setHead[A](l: List[A], h: A): List[A] = {
+    l match {
+      case Cons(h2,t) => Cons(h,t)
+      case Nil => throw new IllegalArgumentException
+    }
 
-  def drop[A](l: List[A], n: Int): List[A] = ???
+  }
 
-  def dropWhile[A](l: List[A], f: A => Boolean): List[A] = ???
+  def drop[A](l: List[A], n: Int): List[A] = {
+    if(n < 1){
+      tail(l)
+    }else {
+      drop(tail(l),n-1)
+    }
+  }
 
-  def init[A](l: List[A]): List[A] = ???
+  def dropWhile[A](l: List[A], f: A => Boolean): List[A] = {
+    l match {
+      case Cons(h2,t) => {
+        if (f(h2)) dropWhile(t, f) else l
+      }
+      case Nil => throw new IllegalArgumentException
+    }
+  }
 
-  def length[A](l: List[A]): Int = ???
+  /**
+    * accumulate the initial elements until the tail is Nil
+    */
+  def init[A](l: List[A]): List[A] = {
+    def go(i: List[A], m: List[A]): List[A] = {
+      m match {
+        case Cons(h2, Nil) => {
+          i
+        } 
+        case Cons(h2,t) => {
+          go(List.append(i, Cons(h2, Nil)), t)
+        }
+        case Nil => throw new IllegalArgumentException
+      }
+    }
+    go(l, l)
+  }
 
-  def foldLeft[A,B](l: List[A], z: B)(f: (B, A) => B): B = ???
+  def length[A](l: List[A]): Int = {
+    foldRight(l,0)((x: A, y: Int) => y + 1 )
+  }
 
+  def length2[A](l: List[A]): Int = {
+    foldLeft(l,0)((x: Int, y: A) => x + 1 )
+  }
+
+
+  def foldLeft[A,B](l: List[A], z: B)(f: (B, A) => B): B = {
+    l match {
+      case Cons(h2, Nil) => f(z,h2)
+      case Cons(h2,t) => {
+        foldLeft(t, f(z,h2)) (f)
+      }
+      case Nil => throw new IllegalArgumentException
+    }
+  }
+
+  def foldLeftWithFoldRight[A,B](l: List[A], z: B)(f: (B, A) => B): B = {
+  }
+
+  def reverse[A](l: List[A]): List[A]{
+    foldLeft
+  }
   def map[A,B](l: List[A])(f: A => B): List[B] = ???
 }
